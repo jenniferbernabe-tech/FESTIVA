@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festiva - Encuentra el entretenimiento perfecto para tu evento</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        festiva: {
+                            pink: '#FF2A7A',
+                            purple: '#7C3AED',
+                            yellow: '#FFB800',
+                            blue: '#00A3FF',
+                            dark: '#0F172A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+        }
+        /* Custom range slider styling */
+        input[type=range] {
+            accent-color: #FF2A7A;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #FF2A7A 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%),
+                        url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        /* Smooth backdrop blur transitions */
+        .modal-backdrop {
+            transition: opacity 0.25s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <a href="#" onclick="resetAllFilters(); return false;" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight shrink-0">
+                <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-festiva-pink via-purple-600 to-festiva-blue flex items-center justify-center text-white shadow-md text-xl">
+                    <i class="fa-solid font-black fa-compact-disc animate-spin-slow"></i>
+                </span>
+                <span class="gradient-text text-2xl">Festiva</span>
+            </a>
+
+            <!-- Search Bar in Header -->
+            <div class="hidden md:flex flex-1 max-w-md mx-4 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="headerSearchInput" oninput="handleSearch(this.value)" 
+                       placeholder="Buscar DJs, músicos o entretenimiento..." 
+                       class="w-full pl-11 pr-4 py-2.5 rounded-full bg-slate-100 border border-transparent focus:border-festiva-pink focus:bg-white text-sm focus:outline-none transition-all">
+            </div>
+
+            <!-- Navigation Links & Auth Buttons -->
+            <div class="flex items-center gap-3 md:gap-6">
+                <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
+                    <a href="#explorar" class="hover:text-festiva-pink transition-colors">Explorar</a>
+                    <a href="#categorias" class="hover:text-festiva-pink transition-colors">Categorías</a>
+                    <a href="#como-funciona" onclick="showToast('Saber más sobre Festiva: ¡Explora y cotiza gratis en minutos!')" class="hover:text-festiva-pink transition-colors">Cómo Funciona</a>
+                </nav>
+
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="openModal('loginModal')" class="px-4 py-2 text-sm font-bold text-slate-700 border border-slate-200 rounded-full hover:bg-slate-50 transition-colors">
+                        Iniciar Sesión
+                    </button>
+                    <button onclick="openModal('loginModal')" class="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-festiva-pink to-festiva-purple rounded-full hover:opacity-95 shadow-md shadow-pink-500/20 transition-all">
+                        Registrarse
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Banner Section -->
+        <section class="hero-gradient text-white py-14 px-4 sm:px-6 lg:px-8 text-center relative">
+            <div class="max-w-4xl mx-auto space-y-4">
+                <span class="inline-block px-3 py-1 bg-white/10 backdrop-blur-md text-pink-300 rounded-full text-xs font-semibold tracking-wide uppercase border border-white/20">
+                    🎉 La plataforma #1 en eventos
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                    ¡Encuentra el entretenimiento perfecto para tu evento!
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto">
+                    DJs, Músicos, Bandas y Animadores verificados a un clic de distancia.
+                </p>
+
+                <!-- Quick Categories Selector -->
+                <div id="categorias" class="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+                    <button onclick="filterByCategory('DJ')" class="category-btn bg-white/90 hover:bg-white text-slate-800 p-3.5 rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-all hover:scale-105 active:scale-95 group border border-white">
+                        <span class="w-9 h-9 rounded-xl bg-pink-100 text-festiva-pink flex items-center justify-center text-lg group-hover:bg-festiva-pink group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-compact-disc"></i>
+                        </span>
+                        <span class="font-bold text-sm">DJs</span>
+                    </button>
+
+                    <button onclick="filterByCategory('Músicos')" class="category-btn bg-white/90 hover:bg-white text-slate-800 p-3.5 rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-all hover:scale-105 active:scale-95 group border border-white">
+                        <span class="w-9 h-9 rounded-xl bg-purple-100 text-festiva-purple flex items-center justify-center text-lg group-hover:bg-festiva-purple group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-guitar"></i>
+                        </span>
+                        <span class="font-bold text-sm">Músicos</span>
+                    </button>
+
+                    <button onclick="filterByCategory('Bandas')" class="category-btn bg-white/90 hover:bg-white text-slate-800 p-3.5 rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-all hover:scale-105 active:scale-95 group border border-white">
+                        <span class="w-9 h-9 rounded-xl bg-blue-100 text-festiva-blue flex items-center justify-center text-lg group-hover:bg-festiva-blue group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-users-line"></i>
+                        </span>
+                        <span class="font-bold text-sm">Bandas</span>
+                    </button>
+
+                    <button onclick="filterByCategory('Animación')" class="category-btn bg-white/90 hover:bg-white text-slate-800 p-3.5 rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-all hover:scale-105 active:scale-95 group border border-white">
+                        <span class="w-9 h-9 rounded-xl bg-yellow-100 text-festiva-yellow flex items-center justify-center text-lg group-hover:bg-festiva-yellow group-hover:text-white transition-colors">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </span>
+                        <span class="font-bold text-sm">Animación</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Directory Section -->
+        <section id="explorar" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Sidebar Filters -->
+                <aside class="w-full lg:w-72 shrink-0 space-y-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit sticky top-24">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <h2 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-festiva-pink"></i> Filtros
+                        </h2>
+                        <button onclick="resetAllFilters()" class="text-xs text-slate-500 hover:text-festiva-pink underline font-medium">
+                            Limpiar todo
+                        </button>
+                    </div>
+
+                    <!-- Filter: Location -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Ubicación</label>
+                        <select id="locationSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-festiva-pink/20 focus:border-festiva-pink">
+                            <option value="">Todas las ciudades</option>
+                            <option value="CDMX">CDMX y Área Met.</option>
+                            <option value="Guadalajara">Guadalajara</option>
+                            <option value="Monterrey">Monterrey</option>
+                            <option value="Puebla">Puebla</option>
+                            <option value="Cancún">Cancún</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter: Event Type Checkboxes -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tipo de Evento</label>
+                        <div class="space-y-2 text-sm text-slate-700">
+                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                <input type="checkbox" value="Boda" onchange="applyFilters()" class="event-checkbox w-4 h-4 rounded text-festiva-pink focus:ring-festiva-pink accent-pink-600">
+                                <span>Boda</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                <input type="checkbox" value="Cumpleaños" onchange="applyFilters()" class="event-checkbox w-4 h-4 rounded text-festiva-pink focus:ring-festiva-pink accent-pink-600">
+                                <span>Cumpleaños</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                <input type="checkbox" value="Graduación" onchange="applyFilters()" class="event-checkbox w-4 h-4 rounded text-festiva-pink focus:ring-festiva-pink accent-pink-600">
+                                <span>Graduación</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                <input type="checkbox" value="Corporativo" onchange="applyFilters()" class="event-checkbox w-4 h-4 rounded text-festiva-pink focus:ring-festiva-pink accent-pink-600">
+                                <span>Corporativo / Empresas</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Filter: Budget Range -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-500">
+                            <span>Presupuesto Máximo</span>
+                            <span id="priceDisplay" class="text-festiva-pink font-extrabold text-sm">$15,000 MXN</span>
+                        </div>
+                        <input type="range" id="priceRange" min="3000" max="25000" step="1000" value="25000" 
+                               oninput="updatePriceLabel(this.value); applyFilters();" 
+                               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-slate-400 font-medium">
+                            <span>$3,000</span>
+                            <span>$25,000+ MXN</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter: Minimum Rating -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Calificación Mínima</label>
+                        <select id="ratingSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-festiva-pink/20 focus:border-festiva-pink">
+                            <option value="0">Cualquier calificación</option>
+                            <option value="4.5">4.5 ★ y superior</option>
+                            <option value="4.8">4.8 ★ y superior</option>
+                            <option value="5.0">5.0 ★ Excelente</option>
+                        </select>
+                    </div>
+                </aside>
+
+                <!-- Provider Cards Grid -->
+                <div class="flex-1 space-y-6">
+                    <!-- Results Header / Filter Tags -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+                        <div class="text-slate-600 font-medium text-sm">
+                            Mostrando <span id="resultsCount" class="font-bold text-slate-900">0</span> opciones disponibles
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-slate-500 text-xs uppercase font-bold">Ordenar por:</span>
+                            <select id="sortSelect" onchange="applyFilters()" class="bg-slate-100 border-none font-semibold text-slate-700 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-festiva-pink">
+                                <option value="relevance">Relevancia</option>
+                                <option value="price-low">Precio: Menor a Mayor</option>
+                                <option value="price-high">Precio: Mayor a Menor</option>
+                                <option value="rating">Mejor Calificados</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Grid -->
+                    <div id="providersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Cards dynamically rendered here -->
+                    </div>
+
+                    <!-- Empty state -->
+                    <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
+                        <i class="fa-solid fa-face-frown text-5xl text-slate-300 mb-3"></i>
+                        <h3 class="font-bold text-lg text-slate-700">No encontramos resultados</h3>
+                        <p class="text-slate-500 text-sm mt-1">Intenta ajustar tus filtros de búsqueda o presupuesto.</p>
+                        <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition-colors">
+                            Restablecer Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: Artist Profile Details -->
+    <div id="profileModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('profileModal')"></div>
+
+            <div class="inline-block w-full max-w-3xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl relative z-10">
+                <button onclick="closeModal('profileModal')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors z-20">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <!-- Profile Header Cover -->
+                <div id="modalHeaderBg" class="h-48 sm:h-60 bg-slate-800 bg-cover bg-center relative">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/20"></div>
+                    <span id="modalCategoryBadge" class="absolute top-4 left-4 bg-festiva-pink text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        DJ
+                    </span>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <!-- Title & Rating -->
+                    <div class="flex flex-wrap items-start justify-between gap-4 -mt-16 sm:-mt-20 relative z-10">
+                        <img id="modalAvatar" src="" alt="Artist" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white object-cover shadow-lg bg-white">
+                        <div class="flex-1 min-w-[200px] pt-4 sm:pt-12">
+                            <h2 id="modalName" class="text-2xl sm:text-3xl font-extrabold text-slate-900">Artist Name</h2>
+                            <p id="modalLocation" class="text-slate-500 font-medium text-sm flex items-center gap-1.5 mt-0.5">
+                                <i class="fa-solid fa-location-dot text-festiva-pink"></i> <span>Ubicación</span>
+                            </p>
+                        </div>
+                        <div class="pt-4 sm:pt-12 text-right">
+                            <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl text-amber-700 font-bold text-sm">
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <span id="modalRating">4.9</span>
+                                <span id="modalReviewsCount" class="text-slate-400 font-normal text-xs">(85 opiniones)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-2">Sobre este espectáculo</h3>
+                        <p id="modalBio" class="text-slate-600 text-sm leading-relaxed">
+                            Descripción detallada del artista...
+                        </p>
+                    </div>
+
+                    <!-- Event Types Supported -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Ideal para:</h4>
+                        <div id="modalEventTags" class="flex flex-wrap gap-2">
+                            <!-- Tags rendered via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Media Demo Preview (Simulated Audio / Video) -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-play text-festiva-pink"></i> Muestra de Audio / Demo
+                        </h4>
+                        <div class="flex items-center gap-4 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                            <button onclick="toggleAudioDemo(this)" class="w-10 h-10 rounded-full bg-festiva-pink text-white flex items-center justify-center shrink-0 hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                            <div class="flex-1">
+                                <div id="modalAudioTitle" class="text-xs font-bold text-slate-800">Set de demostración en vivo (2025)</div>
+                                <div class="w-full bg-slate-200 h-2 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-festiva-pink h-full w-1/3 rounded-full"></div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400">03:45</span>
+                        </div>
+                    </div>
+
+                    <!-- Price & Action Bar -->
+                    <div class="pt-4 border-t border-slate-200 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs text-slate-400 font-medium block">Precio por evento desde</span>
+                            <span id="modalPrice" class="text-2xl font-black text-slate-900">$7,500 MXN</span>
+                        </div>
+                        <button id="modalContactBtn" onclick="" class="px-6 py-3 bg-gradient-to-r from-festiva-pink to-festiva-purple text-white font-bold rounded-2xl hover:opacity-95 shadow-lg shadow-pink-500/25 transition-all">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Contactar Ahora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Contact / Request Quote Form -->
+    <div id="contactModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('contactModal')"></div>
+
+            <div class="inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl relative z-10 p-6 sm:p-8">
+                <button onclick="closeModal('contactModal')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-pink-100 text-festiva-pink flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Solicitar Cotización</h3>
+                        <p id="contactModalTarget" class="text-xs text-slate-500 font-medium">Contactando a: <span class="font-bold text-festiva-pink">Artista</span></p>
+                    </div>
+                </div>
+
+                <form onsubmit="submitContactForm(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Tu Nombre</label>
+                        <input type="text" required placeholder="Ej: Carlos Mendoza" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Teléfono/WhatsApp</label>
+                            <input type="tel" required placeholder="55 1234 5678" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Fecha Evento</label>
+                            <input type="date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Tipo de Evento</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                            <option>Boda</option>
+                            <option>Cumpleaños / XV Años</option>
+                            <option>Graduación</option>
+                            <option>Evento Corporativo</option>
+                            <option>Fiesta Privada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Mensaje o Detalles del evento</label>
+                        <textarea rows="3" placeholder="Hola, me gustaría cotizar tu show para un evento de aproximadamente 80 personas..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-festiva-pink to-festiva-purple text-white font-bold rounded-2xl hover:opacity-95 shadow-lg shadow-pink-500/25 transition-all text-sm">
+                            Enviar Mensaje Directo
+                        </button>
+                        <p class="text-[11px] text-center text-slate-400 mt-2">
+                            <i class="fa-solid fa-shield-halved"></i> Festiva garantiza la seguridad de tus datos.
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Simple Login / Signup Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('loginModal')"></div>
+            <div class="inline-block w-full max-w-md my-8 p-6 overflow-hidden text-left bg-white shadow-2xl rounded-3xl relative z-10">
+                <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-2">¡Bienvenido a Festiva!</h3>
+                <p class="text-xs text-slate-500 mb-6">Inicia sesión para guardar tus artistas favoritos o gestionar tus eventos.</p>
+                
+                <form onsubmit="handleLoginDemo(event)" class="space-y-4">
+                    <input type="email" required placeholder="Tu correo electrónico" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                    <input type="password" required placeholder="Contraseña" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-festiva-pink">
+                    <button type="submit" class="w-full py-3 bg-festiva-pink text-white font-bold rounded-xl text-sm hover:bg-pink-600 transition-colors">
+                        Continuar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-sm mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-festiva-pink flex items-center justify-center text-white text-xs font-bold">F</span>
+                <span class="text-white font-extrabold text-base tracking-tight">Festiva.mx</span>
+                <span class="text-xs text-slate-500 ml-2">© 2026 Todos los derechos reservados.</span>
+            </div>
+            <div class="flex items-center gap-6 text-xs font-semibold">
+                <a href="#" class="hover:text-white transition-colors">Términos de Servicio</a>
+                <a href="#" class="hover:text-white transition-colors">Privacidad</a>
+                <a href="#" class="hover:text-white transition-colors">¿Eres proveedor? Únete aquí</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // MOCK PROVIDERS DATA
+        const providers = [
+            {
+                id: 1,
+                name: "DJ Alex Mix",
+                category: "DJ",
+                location: "CDMX",
+                rating: 4.9,
+                reviewsCount: 85,
+                price: 7500,
+                image: "https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop",
+                events: ["Boda", "Cumpleaños", "Corporativo", "Graduación"],
+                bio: "Especialista en bodas y eventos corporativos de alto nivel. Más de 10 años encendiendo las mejores pistas de baile en México con iluminación profesional y mezclas totalmente en vivo."
+            },
+            {
+                id: 2,
+                name: "Mariachi Sol de México",
+                category: "Músicos",
+                location: "CDMX",
+                rating: 4.9,
+                reviewsCount: 112,
+                price: 9200,
+                image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=800&auto=format&fit=crop",
+                events: ["Boda", "Cumpleaños"],
+                bio: "Tradición y distinción mexicana. Mariachi completo con trajes impecables y repertorio clásico y contemporáneo para amenizar tus momentos más memorables."
+            },
+            {
+                id: 3,
+                name: "Saxofonista Elena",
+                category: "Músicos",
+                location: "Guadalajara",
+                rating: 4.8,
+                reviewsCount: 44,
+                price: 5500,
+                image: "https://images.unsplash.com/photo-1525994886773-080587e161c2?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
+                events: ["Boda", "Corporativo"],
+                bio: "Música elegante para recepción, banquetes o momentos lounge. Interpretación instrumental en saxofón con backing tracks de Jazz, Pop y House suave."
+            },
+            {
+                id: 4,
+                name: "Banda Sonidera Cumbia",
+                category: "Bandas",
+                location: "Monterrey",
+                rating: 4.9,
+                reviewsCount: 68,
+                price: 14000,
+                image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800&auto=format&fit=crop",
+                events: ["Cumpleaños", "Graduación", "Boda"],
+                bio: "10 músicos en escena entregando el mejor show de cumbia, salsa y ritmos latinos. Garantizamos un ambiente lleno de energía que pondrá a todos a bailar."
+            },
+            {
+                id: 5,
+                name: "DJ Luna Electrónica",
+                category: "DJ",
+                location: "Guadalajara",
+                rating: 4.7,
+                reviewsCount: 39,
+                price: 8000,
+                image: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop",
+                events: ["Corporativo", "Graduación"],
+                bio: "Sets vanguardistas de Deep House, Synthwave y Pop Electrónico para fiestas exclusivas y lanzamientos de marcas."
+            },
+            {
+                id: 6,
+                name: "Trío Romántico Acústico",
+                category: "Músicos",
+                location: "CDMX",
+                rating: 4.9,
+                reviewsCount: 91,
+                price: 4800,
+                image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?q=80&w=800&auto=format&fit=crop",
+                events: ["Boda", "Cumpleaños"],
+                bio: "Voces armoniosas y guitarras acústicas para cenas intimate, aniversarios y serenatas con los mejores boleros y baladas."
+            },
+            {
+                id: 7,
+                name: "Show Mágico & Neon",
+                category: "Animación",
+                location: "Monterrey",
+                rating: 4.8,
+                reviewsCount: 53,
+                price: 6500,
+                image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop",
+                events: ["Cumpleaños", "Corporativo", "Graduación"],
+                bio: "Animación interactiva con robots LED, pintura neón, lluvia de confeti y concursos para dinamizar tu evento y sorprender a tus invitados."
+            },
+            {
+                id: 8,
+                name: "Rock Legends Cover Band",
+                category: "Bandas",
+                location: "CDMX",
+                rating: 5.0,
+                reviewsCount: 77,
+                price: 18500,
+                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop",
+                cover: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=800&auto=format&fit=crop",
+                events: ["Corporativo", "Graduación", "Cumpleaños"],
+                bio: "Tributo vivo a los clásicos del rock en español e inglés de los 80s, 90s y 2000s. Potencia de sonido y show escénico memorable."
+            }
+        ];
+
+        // State variables
+        let selectedCategory = "";
+        let selectedLocation = "";
+        let searchQuery = "";
+        let maxPrice = 25000;
+        let minRating = 0;
+        let activeContactArtist = null;
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProviders();
+        });
+
+        // Price Label Updates
+        function updatePriceLabel(val) {
+            maxPrice = parseInt(val);
+            const label = document.getElementById('priceDisplay');
+            label.innerText = val >= 25000 ? "$25,000+ MXN" : `$${parseInt(val).toLocaleString()} MXN`;
+        }
+
+        // Category Filter from Quick Buttons
+        function filterByCategory(cat) {
+            selectedCategory = (selectedCategory === cat) ? "" : cat;
+            
+            // Visual feedback on quick buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (selectedCategory && btn.innerText.includes(cat)) {
+                    btn.classList.add('ring-2', 'ring-festiva-pink');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-festiva-pink');
+                }
+            });
+
+            applyFilters();
+        }
+
+        // Header search query listener
+        function handleSearch(query) {
+            searchQuery = query.toLowerCase().trim();
+            applyFilters();
+        }
+
+        // Core Filtering Logic
+        function applyFilters() {
+            // Read UI states
+            selectedLocation = document.getElementById('locationSelect').value;
+            minRating = parseFloat(document.getElementById('ratingSelect').value);
+            const sortVal = document.getElementById('sortSelect').value;
+
+            // Checked event types
+            const checkedEvents = Array.from(document.querySelectorAll('.event-checkbox:checked')).map(cb => cb.value);
+
+            let filtered = providers.filter(p => {
+                // Category match
+                if (selectedCategory && p.category !== selectedCategory) return false;
+                
+                // Location match
+                if (selectedLocation && p.location !== selectedLocation) return false;
+
+                // Price match
+                if (p.price > maxPrice) return false;
+
+                // Rating match
+                if (p.rating < minRating) return false;
+
+                // Search query match
+                if (searchQuery) {
+                    const matchName = p.name.toLowerCase().includes(searchQuery);
+                    const matchCat = p.category.toLowerCase().includes(searchQuery);
+                    const matchBio = p.bio.toLowerCase().includes(searchQuery);
+                    if (!matchName && !matchCat && !matchBio) return false;
+                }
+
+                // Event Type match
+                if (checkedEvents.length > 0) {
+                    const matchesEvent = checkedEvents.some(ev => p.events.includes(ev));
+                    if (!matchesEvent) return false;
+                }
+
+                return true;
+            });
+
+            // Sorting logic
+            if (sortVal === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            renderGrid(filtered);
+        }
+
+        // Reset Filters
+        function resetAllFilters() {
+            selectedCategory = "";
+            selectedLocation = "";
+            searchQuery = "";
+            maxPrice = 25000;
+            minRating = 0;
+
+            document.getElementById('headerSearchInput').value = "";
+            document.getElementById('locationSelect').value = "";
+            document.getElementById('ratingSelect').value = "0";
+            document.getElementById('priceRange').value = "25000";
+            document.getElementById('priceDisplay').innerText = "$25,000+ MXN";
+            document.querySelectorAll('.event-checkbox').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-festiva-pink'));
+
+            applyFilters();
+        }
+
+        function renderGrid(items) {
+            const grid = document.getElementById('providersGrid');
+            const noResults = document.getElementById('noResults');
+            const countLabel = document.getElementById('resultsCount');
+
+            countLabel.innerText = items.length;
+            grid.innerHTML = "";
+
+            if (items.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            items.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group";
+                
+                card.innerHTML = `
+                    <div class="relative h-48 overflow-hidden bg-slate-100">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-slate-800 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">
+                            ${p.category}
+                        </span>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md text-amber-400 text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <i class="fa-solid fa-star text-amber-400"></i> ${p.rating} <span class="text-slate-300 font-normal">(${p.reviewsCount})</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-extrabold text-lg text-slate-900 group-hover:text-festiva-pink transition-colors">${p.name}</h3>
+                            <p class="text-slate-500 text-xs font-medium flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-location-dot text-slate-400"></i> ${p.location}
+                            </p>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold block">Desde</span>
+                                <span class="text-lg font-black text-slate-900">$${p.price.toLocaleString()} <span class="text-xs font-normal text-slate-500">MXN</span></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button onclick="openProfileModal(${p.id})" class="w-full py-2.5 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-50 transition-colors">
+                                Ver Perfil
+                            </button>
+                            <button onclick="openContactModal(${p.id})" class="w-full py-2.5 bg-festiva-pink hover:bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md shadow-pink-500/20 transition-all">
+                                Contactar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderProviders() {
+            applyFilters();
+        }
+
+        // Modal Handlers
+        function openProfileModal(id) {
+            const p = providers.find(item => item.id === id);
+            if (!p) return;
+
+            activeContactArtist = p;
+
+            document.getElementById('modalName').innerText = p.name;
+            document.getElementById('modalCategoryBadge').innerText = p.category;
+            document.getElementById('modalLocation').innerHTML = `<i class="fa-solid fa-location-dot text-festiva-pink"></i> ${p.location}, México`;
+            document.getElementById('modalRating').innerText = p.rating;
+            document.getElementById('modalReviewsCount').innerText = `(${p.reviewsCount} opiniones)`;
+            document.getElementById('modalBio').innerText = p.bio;
+            document.getElementById('modalPrice').innerText = `$${p.price.toLocaleString()} MXN`;
+            document.getElementById('modalAvatar').src = p.image;
+            document.getElementById('modalHeaderBg').style.backgroundImage = `url('${p.cover}')`;
+
+            // Tags
+            const tagsContainer = document.getElementById('modalEventTags');
+            tagsContainer.innerHTML = p.events.map(ev => 
+                `<span class="bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200">${ev}</span>`
+            ).join('');
+
+            document.getElementById('modalContactBtn').onclick = () => {
+                closeModal('profileModal');
+                openContactModal(p.id);
+            };
+
+            openModal('profileModal');
+        }
+
+        function openContactModal(id) {
+            const p = providers.find(item => item.id === id);
+            if (p) {
+                activeContactArtist = p;
+                document.getElementById('contactModalTarget').innerHTML = `Contactando a: <span class="font-bold text-festiva-pink">${p.name}</span> (${p.category})`;
+            }
+            openModal('contactModal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Simulated Audio Demo Toggle
+        function toggleAudioDemo(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fa-play')) {
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+                showToast("▶ Reproduciendo muestra de audio simulada...");
+            } else {
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+            }
+        }
+
+        function submitContactForm(event) {
+            event.preventDefault();
+            closeModal('contactModal');
+            const targetName = activeContactArtist ? activeContactArtist.name : 'el artista';
+            showToast(`✅ ¡Solicitud enviada a ${targetName}! Te contactará pronto por WhatsApp.`);
+        }
+
+        function handleLoginDemo(e) {
+            e.preventDefault();
+            closeModal('loginModal');
+            showToast("🎉 ¡Sesión iniciada correctamente en Festiva!");
+        }
+
+        // Toast Notification Function
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = "bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 pointer-events-auto transition-all transform translate-y-4 opacity-0";
+            toast.innerHTML = `<span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 50);
+
+            // Animate Out and remove
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
